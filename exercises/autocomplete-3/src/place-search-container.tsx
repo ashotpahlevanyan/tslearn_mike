@@ -8,6 +8,7 @@ import { PlaceSearchResultList } from './place-search-result-list';
 
 export class PlaceSearchContainer extends React.Component<{}, {}> {
   constructor() {
+    // @ts-ignore
     super();
     this.state = {};
     // Event handler for changes to search term

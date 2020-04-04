@@ -8,17 +8,18 @@ interface IStack<T> {
 
 interface IStackNode<T> {
   data: T;
-  next: IStackNode<T>
+  next: IStackNode<T> | undefined;
 }
 
-export class Stack<T> implements IStack<T>{
-  private head: IStackNode<T>
+export class Stack<T> implements IStack<T> {
+  private head: IStackNode<T> | undefined;
 
   push(item: T): Stack<T>;
   push(items: T[]): Stack<T>;
-  // the implementation, not accessible directly
+
+  // implementation not accissible directly
   push(itemOrArray: T | T[]): Stack<T> {
-    if (itemOrArray instanceof Array) {
+    if(itemOrArray instanceof Array) {
       itemOrArray.forEach(item => this.push(item));
     } else {
       let n = {
@@ -29,12 +30,17 @@ export class Stack<T> implements IStack<T>{
     }
     return this;
   }
+
   pop(): T | undefined {
     let n = this.head;
-    if (!n) return undefined;
+    if(!n) {
+      return undefined;
+    }
+    // @ts-ignore
     this.head = this.head.next;
     return n.data;
   }
+
   length(): number {
     let n = this.head;
     let l = 0;
@@ -44,6 +50,7 @@ export class Stack<T> implements IStack<T>{
     }
     return l;
   }
+
   print(): void {
     let n = this.head;
     while(n) {

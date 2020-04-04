@@ -8,6 +8,7 @@ interface IAppState {
 
 export class App extends React.Component<{}, IAppState> {
   constructor() {
+    // @ts-ignore
     super();
     this.state = {
       results: []

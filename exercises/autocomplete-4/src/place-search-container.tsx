@@ -13,6 +13,7 @@ interface IPlaceSearchContainerState {
 
 export class PlaceSearchContainer extends React.Component<{}, IPlaceSearchContainerState> {
   constructor() {
+    // @ts-ignore
     super();
     this.state = {
       term: '',
@@ -31,7 +32,7 @@ export class PlaceSearchContainer extends React.Component<{}, IPlaceSearchContai
    * @return {undefined}
    */
   beginSearch(term: string) {
-    
+
     // Kick off the new search, with the new search term
     let p = autocomplete(term);
     // Update the existingSearch state, so our component re-renders
