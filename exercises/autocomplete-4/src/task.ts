@@ -1,4 +1,9 @@
 import {isPromise, wait} from './utils/promise';
+
+export interface CancellablePromise<T> extends PromiseLike<T> {
+  cancelled: boolean;
+}
+
 /**
  * Given a generator function that yields one or more
  * promises, chain them together in sequence
@@ -6,38 +11,41 @@ import {isPromise, wait} from './utils/promise';
  * @param {any} genFn generator function that yields one or more promises
  * @return {undefined}
  */
-export function task<T>(genFn: () => IterableIterator<any>): Promise<T> {
+export function task<T>(genFn: () => IterableIterator<any>): CancellablePromise<T> {
+  // @ts-ignore
   let p = new Promise<T>((resolve) => {
     let it = genFn(); // Get the iterator
     // TODO: implement your solution here
-
+    let value: any;
     function nextStep(lastPromiseVal: any) {
       let itResult = it.next(lastPromiseVal);
-      if(itResult.done) {
-        console.log('done');
+      if(itResult.done && typeof itResult.value === 'undefined') {
+        resolve(value as T);
         return;
       } else {
-        let { value } = itResult;
+        value = itResult.value;
         if(isPromise(value)) {
-          console.log('is a promise');
           value.then((promiseResult: any) => {
-            nextStep(promiseResult);
+            if(!p.cancelled) {
+              nextStep(promiseResult);
+            }
           });
         } else {
-          console.log('not a promise');
         }
       }
     }
     nextStep(undefined);
-  });
+  }) as CancellablePromise<T>;
+  p.cancelled = false;
   return p;
 }
 
 task(function*() {
-  yield wait(600).then(() => {
-    console.log('600 done');
-  });
-  yield wait(300).then(() => {
-    console.log('300 done');
-  });
+  let first = yield wait(500).then(() => 'FIRST');
+  console.log('first', first);
+  let second = yield wait(500).then(() => 'SECOND');
+  console.log('second', second);
+  return 'third';
+}).then(lastVal => {
+  console.log("-------->", lastVal);
 });
